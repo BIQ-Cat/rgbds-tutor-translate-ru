@@ -2,7 +2,7 @@
 
 В этом уроке мы начнем писать новый проект.
 Мы напишем клон [Breakout](https://en.wikipedia.org/wiki/Breakout_%28video_game%29) / [Arkanoid](https://en.wikipedia.org/wiki/Arkanoid), который назовем "Unbricked"!
-(Хотя, дайте ему любое имя, это все-таки *ваш* проект.)
+(Хотя, дайте ему любое имя, это все-таки _ваш_ проект.)
 
 Откройте терминал и создайте новую папку (`mkdir unbricked`), перейдите в нее (`cd unbricked`), как вы это делали для ["Hello, world!"](../part1/hello_world.md).
 
@@ -13,109 +13,109 @@
 ```
 Зачем нужен `hardware.inc`?
 Тот код, который мы пишем, взаимодействует только с процессором, но не со всей консолью(по крайней мере, напрямую).
-To interact with other components (like the graphics system, say), [Memory-Mapped <abbr title="Input/Output">I/O</abbr>](https://en.wikipedia.org/wiki/Memory-mapped_I/O) (MMIO) is used: basically, [memory](../part1/memory.md) in a certain range (addresses $FF00–FF7F) does special things when accessed.
+Чтобы взаимодействовать с другими компонентами (например, с графикой), ипользуется [Memory-Mapped <abbr title="Input/Output">I/O</abbr>](https://en.wikipedia.org/wiki/Memory-mapped_I/O) (MMIO), проще говоря, [память](../part1/memory.md) в определенном промежутке (адреса $FF00–FF7F) при обращении выполняют особые функции.
 
-These bytes of memory being interfaces to the hardware, they are called *hardware registers* (not to be mistaken with [the CPU registers](../part1/registers.md)).
-For example, the "PPU status" register is located at address $FF41.
-Reading from that address reports various bits of info regarding the graphics system, and writing to it allows changing some parameters.
-But, having to remember all the numbers ([non-exhaustive list](https://gbdev.io/pandocs/Power_Up_Sequence.html#hardware-registers)) would be very tedious—and this is where `hardware.inc` comes into play!
-`hardware.inc` defines one constant for each of these registers (for example, `rSTAT` for the aforementioned "PPU status" register), plus some additional constants for values read from or written to these registers.
+Эти байты памяти являются интерфейсом для консоли, которые называются _регистрами <abbr title="аппаратное обеспечение">АО</abbr>_ (не путать с [регистрами процессора](../part1/registers.md)).
+Например, регистры "PPU статуса" находятся на $FF41.
+В этих адресах хранятся параметры графической системы, их можно менять по нужде.
+Но помнить весь ([бесконечный список регистров](https://gbdev.io/pandocs/Power_Up_Sequence.html#hardware-registers)) очень сложно, здесь и вступает в игру `hardware.inc`!
+`hardware.inc` определяет каждому регистру свою константу (например, `rSTAT` для ранее упомянутого регистра "PPU статуса"), плюс еще несколько дополнительных для чтения и записи регистров.
 
 ::: tip
 
-Don't worry if this flew over your head, we'll see an example below with `rLCDC` and `LCDCF_ON`.
+Если после прочтения данной информации у вас побаливает голова, то рекомендуем посмотреть на примеры с `rLCDC` и `LCDCF_ON`.
 
-By the way, the `r` stands for "register", and the `F` in `LCDCF` stands for "flag".
+Кстати, `r` означает "register", `F` в `LCDCF` означает "flag".
 
 :::
 
-Next, make room for the header.
-[Remember from Part Ⅰ](../part1/header.md) that the header is where some information that the Game Boy relies on is stored, so you don't want to accidentally leave it out.
+Следом, мы выделяем место под заголовок.
+[Помните из Ⅰ части](../part1/header.md), что заголовок - это место, где хранится информация, на которую опирается gameboy, поэтому вы бы не хотели оставить его пустым.
 
 ```rgbasm,linenos,start={{#line_no_of "" ../../unbricked/getting-started/main.asm:header}}
 {{#include ../../unbricked/getting-started/main.asm:header}}
 ```
 
-The header jumps to `EntryPoint`, so let's write that now:
+Из заголовка мы переходим в `EntryPoint`, поэтому давайте напишем следующее:
 
 ```rgbasm,linenos,start={{#line_no_of "" ../../unbricked/getting-started/main.asm:entry}}
 {{#include ../../unbricked/getting-started/main.asm:entry}}
 ```
 
-The next few lines wait until "VBlank", which is the only time you can safely turn off the screen (doing so at the wrong time could damage a real Game Boy, so this is very crucial).
-We'll explain what VBlank is and talk about it more later in the tutorial.
+Следующий участок кода ждет "VBlank", только во время которого можно выключить экран (если выключить экран в любое другое время, то можно поломать реальный gameboy).
+Мы объясним что такое VBlank позже.
 
-Turning off the screen is important because loading new tiles while the screen is on is tricky—we'll touch on how to do that in Part 3.
+Выключение экрана очень важно, потому что загрузка новых тайлов при включенном экране очень неприятна—мы затронем эту тему в 3 части.
 
-Speaking of tiles, we're going to load some into VRAM next, using the following code:
+Говоря о тайлах, мы их загрузим в VRAM, используя этот код:
 
 ```rgbasm,linenos,start={{#line_no_of "" ../../unbricked/getting-started/main.asm:copy_tiles}}
 {{#include ../../unbricked/getting-started/main.asm:copy_tiles}}
 ```
 
-This loop might be [reminiscent of part Ⅰ](../part1/jumps.md#conditional-jumps).
-It copies starting at `Tiles` to `$9000` onwards, which is the part of VRAM where our [tiles](../part1/tiles.md) are going to be stored.
-Recall that `$9000` is where the data of background tile $00 lies, and the data of subsequent tiles follows right after.
-To get the number of bytes to copy, we will do just like in Part Ⅰ: using another label at the end, called `TilesEnd`, the difference between it (= the address after the last byte of tile data) and `Tiles` (= the address of the first byte) will be exactly that length.
+Этот цикл может вам напомнить тот, который [из первой части Ⅰ](../part1/jumps.md#conditional-jumps).
+Мы начинаем копировать из `Tiles` в `$9000`, который является частью VRAM, где и будут храниться наши [тайлы](../part1/tiles.md).
+Повторим то, что `$9000`, это место, где находится нулевой тайл, тайлы далее идут следом.
+Чтобы получить кол-во байтов, которые нужно скопировать, мы делаем прямо как в Ⅰ части: используем другую метку в конце, названную `TilesEnd`, разница между `TilesEnd` (= адрес последнего байта тайлов) и `Tiles` (= адрес первого байта) будет равнятся кол-ву байтов.
 
-That said, we haven't written `Tiles` nor any of the related data yet.
-We'll get to that later!
+Однако, мы пока ничего не нарисовали для отображения.
+Мы к этому вернемся!
 
-Almost done now—next, write another loop, this time for copying [the tilemap](../part1/tilemap.md).
+Почти закончили, теперь напишем другой цикл, на этот раз для копирования [tilemap'а](../part1/tilemap.md).
 
 ```rgbasm,linenos,start={{#line_no_of "" ../../unbricked/getting-started/main.asm:copy_map}}
 {{#include ../../unbricked/getting-started/main.asm:copy_map}}
 ```
 
-Note that while this loop's body is exactly the same as `CopyTiles`'s, the 3 values loaded into `de`, `hl`, and `bc` are different.
-These determine the source, destination, and size of the copy, respectively.
+Отметим, что тело цикла идентично `CopyTiles`, 3 разных значения, загружены в `de`, `hl`, и `bc`.
+Они определяет места: откуда копировать, куда копировать и размер.
 
 ::: tip "[<abbr title="Don't Repeat Yourself">DRY</abbr>](https://en.wikipedia.org/wiki/Don't_Repeat_Yourself)"
 
-If you think that this is super redundant, you are not wrong, and we will see later how to write actual, reusable *functions*.
-But there is more to them than meets the eye, so we will start tackling them much later.
+Наверное, вы заметили, что код повторяется, и вы правы, мы скоро увидим как писать полноценные _функции_, которые можно будет переиспользовать.
+Но сейчас есть более важные темы.
 
 :::
 
-Finally, let's turn the screen back on, and set a [background palette](../part1/palettes.md).
-Rather than writing the non-descript number `%10000001` (or $81 or 129, to taste), we make use of two constants graciously provided by `hardware.inc`: `LCDCF_ON` and `LCDCF_BGON`.
-When written to [`rLCDC`](https://gbdev.io/pandocs/LCDC), the former causes the PPU and screen to turn back on, and the latter enables the background to be drawn.
-(There are other elements that could be drawn, but we are not enabling them yet.)
-Combining these constants must be done using `|`, the *binary "or"* operator; we'll see why later.
+Наконец-то, давайте включим экран, и выберем [фоновую палитру](../part1/palettes.md).
+Вместо написания таких чисел: `%10000001` ($81 или 129, на ваш вкус), мы используем 2 константы, предоставленные  `hardware.inc`: `LCDCF_ON` и `LCDCF_BGON`.
+Когда записываем данные в [`rLCDC`](https://gbdev.io/pandocs/LCDC), LCDCF_ON включает PPU и экран, а LCDCF_BGON позволяет нам рисовать на заднем фоне.
+(Есть также другие элементы, которые могут быть нарисованы, но мы их пока не включаем.)
+Комбинировать константы можно при помощи `|`: (оператора _побитового "или"_); мы рассмотрим это позже.
 
 ```rgbasm,linenos,start={{#line_no_of "" ../../unbricked/getting-started/main.asm:end}}
 {{#include ../../unbricked/getting-started/main.asm:end}}
 ```
 
-There's one last thing we need before we can build the ROM, and that's the graphics.
-We will draw the following screen:
+Прежде чем скомпилировать ROM, надо настроить графику.
+Мы нарисуем на экане следующее:
 
 ![Layout of unbricked](../assets/part2/img/tilemap.png)
 
-In `hello-world.asm`, tile data had been written out by hand in hexadecimal; this was to let you see how the sausage is made at the lowest level, but *boy* is it impractical to write!
-This time, we will employ a more friendly way, which will let us write each row of pixels more easily.
-For each row of pixels, instead of writing [the bitplanes](../part1/tiles.md#encoding) directly, we will use a backtick (`` ` ``) followed by 8 characters.
-Each character defines a single pixel, intuitively from left to right; it must be one of 0, 1, 2, and 3, representing the corresponding color index in [the palette](../part1/palettes.md).
+В `hello-world.asm`, мы копировали тайлы вручную; делали это для того чтобы было понятно, как программа работает под капотом, но выполнять все это руками очень непрактично!
+Здесь же, мы предлагаем более дружественный к глазам путь, который позволит проще записывать строчки пикселей.
+Для каждой строки, вместо копирования [битовых плоскостей](../part1/tiles.md#encoding) напрямую, мы будем использовать тильду (`` ` ``) и 8 символов.
+Каждый символ определяет один пиксель слева направо; это должен быть 0, 1, 2, или 3, показывающие цветовой индекс в [палитре](../part1/palettes.md).
 
 ::: tip
 
-If the character selection isn't to your liking, you can use [RGBASM's `-g` option](https://rgbds.gbdev.io/docs/v0.5.2/rgbasm.1#g) or [`OPT g`](https://rgbds.gbdev.io/docs/v0.5.2/rgbasm.5/#Changing_options_while_assembling) to pick others.
-For example, `rgbasm -g '.xXO' (...)` or `OPT g.xXO` would swap the four characters to `.`, `x`, `X`, and `O` respectively.
+Если вам не нравится наши цветовые символы, вы можете использовать [`-g` option RGBASM'а](https://rgbds.gbdev.io/docs/v0.5.2/rgbasm.1#g) или [`OPT g`](https://rgbds.gbdev.io/docs/v0.5.2/rgbasm.5/#Changing_options_while_assembling) чтобы выбрать другие.
+Например, `rgbasm -g '.xXO' (...)` или `OPT g.xXO` заставит использовать символы `.`, `x`, `X`, `O` вместо тех, что выше.
 
 :::
 
-For example:
+Например:
 
 ```rgbasm
-	dw `01230123 ; This is equivalent to `db $55,$33`
+	dw `01230123 ; эквивалентно `db $55,$33`
 ```
 
-You may have noticed that we are using `dw` instead of `db`; the difference between these two will be explained later.
-We already have tiles made for this project, so you can copy [this premade file](https://github.com/gbdev/gb-asm-tutorial/raw/master/unbricked/getting-started/tileset.asm), and paste it at the end of your code.
+Вы, наверное, заметили, что здесь используется `dw` вместо `db`; разницу между ними мы рассмотрим позже...
+У нас уже есть нарисованные тайлы для проекта, поэтому вы можете скопировать этот [файл](https://github.com/gbdev/gb-asm-tutorial/raw/master/unbricked/getting-started/tileset.asm), и вставить его в конец вашего кода.
 
-Then copy the tilemap from [this file](https://github.com/gbdev/gb-asm-tutorial/raw/master/unbricked/getting-started/tilemap.asm), and paste it after the `TilesEnd` label.
+Затем скопируйте Tilemap также из этого [файла](https://github.com/gbdev/gb-asm-tutorial/raw/master/unbricked/getting-started/tilemap.asm) и вставьте его после `TilesEnd`.
 
-You can build the ROM now, by running the following commands in your terminal:
+Теперь же вы можете скомпилировать ROM с помощью следующих команд:
 
 ```console
 $ rgbasm -L -o main.o main.asm
@@ -123,7 +123,7 @@ $ rgblink -o unbricked.gb main.o
 $ rgbfix -v -p 0xFF unbricked.gb
 ```
 
-If you run this in your emulator, you should see the following:
+Если вы запускаете ROM в эмуляторе, то должны увидить следующее:
 
 ![Screenshot of our game](../assets/part2/img/screenshot.png)
 
