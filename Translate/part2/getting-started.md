@@ -127,15 +127,15 @@ $ rgbfix -v -p 0xFF unbricked.gb
 
 ![Screenshot of our game](../assets/part2/img/screenshot.png)
 
-That white square seems to be missing!
-You may have noticed this comment earlier, somewhere in the tile data:
+Кажется, не хватает белого квадрата!
+Вы могли заметить такой комментарий:
 
 ```rgbasm,linenos,start={{#line_no_of "" ../../unbricked/getting-started/main.asm:custom_logo}}
 {{#include ../../unbricked/getting-started/main.asm:custom_logo}}
 ```
 
-The logo tiles were left intentionally blank so that you can choose your own.
-You can use one of the following pre-made logos, or try coming up with your own!
+Тайлы, которые нужны под отображение логотипа остались пусты.
+Вы можете использовать наши логотипы или сделать свой!
 
 - **RGBDS Logo**
 
@@ -155,4 +155,4 @@ You can use one of the following pre-made logos, or try coming up with your own!
 
   [Source](https://github.com/gbdev/gb-asm-tutorial/raw/master/unbricked/getting-started/tail.asm)
 
-Add your chosen logo's data (click one of the "Source" links above) after the comment, build the game again, and you should see your logo of choice in the bottom-right!
+Добавьте код выбранного логотипа после комментария, пересоберите игру и вы должны увидеть ваш логотип в правом нижнем углу!
