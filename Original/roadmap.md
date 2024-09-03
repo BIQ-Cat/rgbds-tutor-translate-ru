@@ -1,7 +1,7 @@
 # Roadmap
 
-The tutorial is split into three sections.
-**I strongly advise you go through the tutorial in order!**
+The tutorial is split into three parts.
+**We strongly advise you go through the tutorial in order!**
 
 In Part Ⅰ, we run our first "Hello World!" program, which we then dissect to learn what makes the Game Boy tick.
 
@@ -10,7 +10,7 @@ Along the way, we will make plenty of mistakes, so we can learn how to debug our
 
 And finally, Part Ⅲ is about "advanced" use of the hardware, where we learn how to make even better-looking games, and we program a Shoot 'Em Up!
 
-::: tip
+:::tip
 
 We hope this tutorial will work for you.
 
