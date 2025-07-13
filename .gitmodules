@@ -1,0 +1,3 @@
+[submodule "gb-asm-tutorial"]
+	path = gb-asm-tutorial
+	url = https://github.com/gbdev/gb-asm-tutorial
