@@ -5,5 +5,3 @@ Translation of RGBDS to Russian.
 - _Translate-old/_ - old translation by @Coll256
 - _Translate/_ - final translation
 - _заметки.txt_ - TODO-list
-
-___Original/_ and _Translate/_ directories repeat content of src/ folder in tutorial repository without assets__
