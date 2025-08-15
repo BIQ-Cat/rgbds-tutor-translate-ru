@@ -149,7 +149,7 @@ $ rgbfix -v -p 0xFF unbricked.gb
 
   [Исходный код](https://github.com/gbdev/gb-asm-tutorial/raw/master/unbricked/getting-started/duck.asm)
 
-- **Хвост❤**
+- **Хвост**
 
   ![A silhouette of a tail](../assets/part2/img/tail.png)
 
