@@ -3,7 +3,7 @@
 👋 Добро пожаловать в руководство по разработке на gb-assembly! 
 Здесь вы научитесь создавать игры для консолей Game Boy и Game Boy Color.
 
-::: tip
+:::tip
 
 Если консоли Game Boy и Game Boy Color почти одинаковы, то **Game Boy Advanced в техническом плане совершенно другое устройство**, однако Game Boy Advanced может запускать игры для Game Boy и Game Boy Color.
 Если вы хотите создавать игры под Game Boy Color и запускать их на Game Boy Advanced, то вы пришли по адресу; но, если вы хотите писать игры именно под Game Boy Advanced, пожалуйста, ознакомьтесь с [этим материалом](https://gbadev.net/tonc/).
