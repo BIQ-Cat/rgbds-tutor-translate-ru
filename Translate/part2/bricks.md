@@ -2,7 +2,7 @@
 
 Наш мячик пока только прыгает из стороны в сторону. Сейчас мы научим его ломать блоки.
 
-Прежде, чем начнём, давайте познакимся с созданием *констант*.
+Прежде, чем начнём, давайте познакимся с *константами*.
 Мы уже пользовались до этого некоторыми константами, например `rLCDC` из файла `hardware.inc`, однако мы также можем создавать свои собственные для любых задач.
 Давайте определим три константы в начале файла, в которые запишем ID тайлов, содержащих левую и правую части блока, а также ID пустого тайла.
 ```rgbasm,linenos,start={{#line_no_of "" ../../unbricked/bricks/main.asm:constants}}
@@ -28,14 +28,14 @@
 Убедитесь в том, что ничего не пропустили.
 Вызов должен идти прямо перед модификацией направления мяча.
 
-```diff,linenos,start={{#line_no_of "" ../../unbricked/bricks/main.asm:updated-bounce}}
+````diff,linenos,start={{#line_no_of "" ../../unbricked/bricks/main.asm:updated-bounce}}
 BounceOnTop:
 	; Remember to offset the OAM position!
 	; (8, 16) in OAM coordinates is (0, 0) on the screen.
-	ld a, [_OAMRAM + 4]
+	ld a, [STARTOF(OAM) + 4]
 	sub a, 16 + 1
 	ld c, a
-	ld a, [_OAMRAM + 5]
+	ld a, [STARTOF(OAM) + 5]
 	sub a, 8
 	ld b, a
 	call GetTileByPixel ; Returns tile address in hl
@@ -47,10 +47,10 @@ BounceOnTop:
 	ld [wBallMomentumY], a
 
 BounceOnRight:
-	ld a, [_OAMRAM + 4]
+	ld a, [STARTOF(OAM) + 4]
 	sub a, 16
 	ld c, a
-	ld a, [_OAMRAM + 5]
+	ld a, [STARTOF(OAM) + 5]
 	sub a, 8 - 1
 	ld b, a
 	call GetTileByPixel
@@ -62,10 +62,10 @@ BounceOnRight:
 	ld [wBallMomentumX], a
 
 BounceOnLeft:
-	ld a, [_OAMRAM + 4]
+	ld a, [STARTOF(OAM) + 4]
 	sub a, 16
 	ld c, a
-	ld a, [_OAMRAM + 5]
+	ld a, [STARTOF(OAM) + 5]
 	sub a, 8 + 1
 	ld b, a
 	call GetTileByPixel
@@ -77,10 +77,10 @@ BounceOnLeft:
 	ld [wBallMomentumX], a
 
 BounceOnBottom:
-	ld a, [_OAMRAM + 4]
+	ld a, [STARTOF(OAM) + 4]
 	sub a, 16 - 1
 	ld c, a
-	ld a, [_OAMRAM + 5]
+	ld a, [STARTOF(OAM) + 5]
 	sub a, 8
 	ld b, a
 	call GetTileByPixel
